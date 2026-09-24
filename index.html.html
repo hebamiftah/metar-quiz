@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>METAR Abbreviation Quiz</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--fg:#1a2233;--muted:#5b6678;--acc:#1f6feb;--ok:#1a7f37;--bad:#c62828;--bd:#d5dbe5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111722;--card:#1a2233;--fg:#e8edf5;--muted:#9aa6ba;--acc:#5b9dff;--ok:#4cc26b;--bad:#ff7b72;--bd:#2c3850}}
+:root[data-theme="dark"]{--bg:#111722;--card:#1a2233;--fg:#e8edf5;--muted:#9aa6ba;--acc:#5b9dff;--ok:#4cc26b;--bad:#ff7b72;--bd:#2c3850}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:600px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 12px}
+.bar{height:6px;background:var(--bd);border-radius:3px;margin-bottom:16px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.lbl{color:var(--muted);font-size:.85rem;margin:0 0 4px}
+.cond{font-size:1.2rem;font-weight:600;margin:0 0 14px}
+input{width:100%;box-sizing:border-box;font:inherit;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.1rem;text-transform:uppercase;padding:10px 12px;border:2px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg)}
+input:focus{outline:none;border-color:var(--acc)}
+input.ok{border-color:var(--ok)}input.bad{border-color:var(--bad)}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+button{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:10px 18px;font:inherit;cursor:pointer}
+button.alt{background:transparent;color:var(--muted);border:1px solid var(--bd)}
+button:disabled{opacity:.5;cursor:default}
+.fb{margin:12px 0 0}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.score{font-size:2rem;font-weight:700}
+ul{padding-left:20px}code{font-family:ui-monospace,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+<main>
+<h1>✈️ METAR Abbreviation Quiz</h1>
+<p class="sub" id="sub"></p>
+<div class="bar"><i id="pb"></i></div>
+<div class="card" id="c"></div>
+</main>
+<script>
+// format: answer|condition|alternate answers (comma separated, optional)
+var RAW=`$|Maintenance check indicator
+-|Light intensity (prefix on weather)
++|Heavy intensity (prefix on weather)
+/|Separator between temperature and dew point (also indicates RVR data follows)
+ACC|Altocumulus castellanus
+ACFT MSHP|Aircraft mishap
+ACSL|Altocumulus standing lenticular cloud
+AO1|Automated station without precipitation discriminator
+AO2|Automated station with precipitation discriminator
+ALP|Airport location point
+APCH|Approach
+APRNT|Apparent
+APRX|Approximately
+ATCT|Airport traffic control tower
+AUTO|Fully automated report
+B|Began
+BC|Patches
+BKN|Broken
+BL|Blowing
+BR|Mist
+C|Center (with reference to runway designation)
+CA|Cloud-air lightning
+CB|Cumulonimbus cloud
+CBMAM|Cumulonimbus mammatus cloud
+CC|Cloud-cloud lightning
+CCSL|Cirrocumulus standing lenticular cloud
+CD|Candela
+CG|Cloud-ground lightning
+CHI|Cloud-height indicator
+CHINO|Sky condition at secondary location not available
+CIG|Ceiling
+CLR|Clear (ASOS: no clouds detected below 12,000 ft)
+CONS|Continuous
+COR|Correction to a previously disseminated report
+DOC|Department of Commerce
+DOD|Department of Defense
+DOT|Department of Transportation
+DR|Low drifting
+DS|Duststorm
+DSIPTG|Dissipating
+DSNT|Distant
+DU|Widespread dust
+DVR|Dispatch visual range
+DZ|Drizzle
+E|East (also: ended, estimated ceiling)
+FAA|Federal Aviation Administration
+FC|Funnel cloud
+FEW|Few clouds
+FG|Fog
+FIBI|Filed but impracticable to transmit
+FIRST|First observation after a break in coverage at a manual station
+FMH-1|Federal Meteorological Handbook No. 1, Surface Weather Observations & Reports (METAR)|FMH1
+FMH-2|Federal Meteorological Handbook No. 2|FMH2
+FRQ|Frequent
+FROPA|Frontal passage
+FT|Feet
+FU|Smoke
+FZ|Freezing
+FZFG|Freezing fog
+FZRA|Freezing rain
+FZRANO|Freezing rain sensor not available
+G|Gust
+GR|Hail
+GS|Small hail and/or snow pellets
+HLSTO|Hailstone
+HZ|Haze
+IC|Ice crystals
+ICAO|International Civil Aviation Organization
+INCRG|Increasing
+INTMT|Intermittent
+KT|Knots
+L|Left (with reference to runway designation)
+LAST|Last observation before a break in coverage at a manual station
+LST|Local Standard Time
+LTG|Lightning
+LWR|Lower
+M|Minus, less than
+MAX|Maximum
+METAR|Routine weather report provided hourly
+MI|Shallow
+MIN|Minimum
+MOV|Moved / moving / movement
+MT|Mountains
+N|North
+N/A|Not applicable
+NCDC|National Climatic Data Center
+NE|Northeast
+NOS|National Ocean Survey
+NOSPECI|No SPECI reports are taken at this station
+NOTAM|Notice to Airmen
+NW|Northwest
+NWS|National Weather Service
+OCNL|Occasional
+OFCM|Office of the Federal Coordinator for Meteorology
+OHD|Overhead
+OVC|Overcast
+OVR|Over
+P|Indicates greater than the highest reportable value
+PCPN|Precipitation
+PK WND|Peak wind
+PL|Ice pellets
+PNO|Precipitation amount not available
+PO|Dust/sand whirls (dust devils)
+PR|Partial
+PRES|Pressure
+PRESFR|Pressure falling rapidly
+PRESRR|Pressure rising rapidly
+PWINO|Precipitation identifier sensor not available
+PY|Spray
+R|Right (with reference to runway designation)
+RA|Rain
+RMK|Remarks identifier
+RTD|Routine delayed (late) observation
+RV|Reportable value
+RVR|Runway visual range
+RVRNO|RVR system values not available
+RY|Runway
+S|South
+SA|Sand
+SCSL|Stratocumulus standing lenticular cloud
+SCT|Scattered
+SE|Southeast
+SFC|Surface
+SG|Snow grains
+SH|Shower(s)
+SKC|Sky clear
+SLP|Sea-level pressure
+SLPNO|Sea-level pressure not available
+SM|Statute miles
+SN|Snow
+SNINCR|Snow increasing rapidly
+SP|Snow pellets
+SPECI|An unscheduled (special) report taken when certain criteria have been met
+SQ|Squalls
+SS|Sandstorm
+STN|Station
+SW|Southwest
+SW|Snow shower
+TCU|Towering cumulus
+TS|Thunderstorm
+TSNO|Thunderstorm information not available
+TWR|Tower
+UNKN|Unknown
+UP|Unknown precipitation
+UTC|Coordinated Universal Time
+V|Variable
+VA|Volcanic ash
+VC|In the vicinity
+VIS|Visibility
+VISNO|Visibility at secondary location not available
+VR|Visual range
+VRB|Variable (wind direction)
+VV|Vertical visibility
+W|West
+WG/SO|Working Group for Surface Observations
+WMO|World Meteorological Organization
+WND|Wind
+WSHFT|Wind shift
+Z|Zulu, i.e., Coordinated Universal Time`;
+var Q=RAW.split("\n").map(function(l){var p=l.split("|");return{a:p[0],c:p[1],alt:(p[2]||"").split(",").filter(Boolean)}});
+var order=[],N=0,i=0,sc=0,miss=[],c=document.getElementById("c"),pb=document.getElementById("pb"),sub=document.getElementById("sub");
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function norm(s){return s.toUpperCase().replace(/\s+/g,"")}
+function shuf(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=a[k];a[k]=a[j];a[j]=t}return a}
+function menu(){
+ pb.style.width="0";sub.textContent="Type the abbreviation for each condition. "+Q.length+" terms from the METAR abbreviation list.";
+ c.innerHTML='<p class="cond">Choose a round length</p><div class="row"><button data-n="20">20 questions</button><button data-n="50">50 questions</button><button data-n="'+Q.length+'">All '+Q.length+'</button></div>';
+ c.querySelectorAll("button").forEach(function(b){b.onclick=function(){start(+b.dataset.n)}});
+}
+function start(n){N=Math.min(n,Q.length);order=shuf(Q).slice(0,N);i=0;sc=0;miss=[];show()}
+function show(){
+ if(i>=N){pb.style.width="100%";sub.textContent="Done!";
+  var h='<div class="score">'+sc+' / '+N+'</div>';
+  if(miss.length){h+='<p>Review these:</p><ul>'+miss.map(function(m){return'<li>'+esc(m.c)+' → <code>'+esc(m.a)+'</code></li>'}).join("")+'</ul>'}else h+='<p>Perfect round!</p>';
+  c.innerHTML=h+'<div class="row"><button id="r">New quiz</button></div>';
+  document.getElementById("r").onclick=menu;return}
+ var q=order[i];pb.style.width=(i/N*100)+"%";sub.textContent="Question "+(i+1)+" of "+N+" · Score "+sc;
+ c.innerHTML='<p class="lbl">Enter the abbreviation for:</p><p class="cond">'+esc(q.c)+'</p><input id="a" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="Type here"><div class="row"><button id="s">Check</button><button class="alt" id="k">Show answer</button></div><div id="f"></div>';
+ var inp=document.getElementById("a"),done=false;inp.focus();
+ function finish(ok,skipped){
+  done=true;inp.disabled=true;inp.classList.add(ok?"ok":"bad");
+  if(ok)sc++;else miss.push(q);
+  document.getElementById("f").innerHTML='<p class="fb '+(ok?"ok":"bad")+'">'+(ok?"Correct! ":(skipped?"Answer: ":"Not quite. Answer: "))+'<b><code>'+esc(q.a)+'</code></b></p><div class="row"><button id="n">'+(i===N-1?"See score":"Next")+'</button></div>';
+  var n=document.getElementById("n");n.focus();n.onclick=function(){i++;show()};
+  document.getElementById("s").disabled=true;document.getElementById("k").disabled=true;
+ }
+ function check(){
+  if(done||!inp.value.trim())return;
+  var v=norm(inp.value),ok=v===norm(q.a)||q.alt.some(function(x){return norm(x)===v});
+  finish(ok,false);
+ }
+ document.getElementById("s").onclick=check;
+ document.getElementById("k").onclick=function(){if(!done)finish(false,true)};
+ inp.onkeydown=function(e){if(e.key==="Enter")check()};
+}
+menu();
+</script>
+</body>
+</html>
